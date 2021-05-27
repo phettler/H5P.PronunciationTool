@@ -1,4 +1,6 @@
-# H5P Audio Recorder
+# H5P Pronunciation Tool
+
+A fork of H5P Audio Recorder for the purpose of creating a vocabulary list to practice pronunciation
 
 ## Getting started
 
