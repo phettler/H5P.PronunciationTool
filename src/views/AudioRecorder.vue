@@ -1,8 +1,22 @@
 <template>
   <div class="h5p-audio-recorder-view">
-    <vuMeter :avgMicFrequency="avgMicFrequency" :enablePulse="state === 'recording'"></vuMeter>
+  <div v-if="state !== 'done'  && title" class="title" v-html="title" />
 
-    <div v-if="state !== 'done'  && title" class="title" v-html="title" />
+  <div role="words" class="audio-recorder-wordlist">
+    <div v-for="word in words" class="word">
+      <div class="text">{{ word.answer }}</div>
+      <div class="audio">
+      <audio v-bind:controls="word.audio.params.controls" v-bind:autoplay="word.audio.params.autoplay" v-for="file in word.audio.params.files">
+        <source v-bind:path="file.path" v-bind:src="getFilePath(file.path)" v-bind:type="file.mime" />
+      </audio>
+      </div>
+      <!--div class="path" v-for="file in word.audio.params.files">
+        {{ getFilePath(file.path) }}
+      </div-->
+    </div>
+  </div>
+
+  <vuMeter :avgMicFrequency="avgMicFrequency" :enablePulse="state === 'recording'"></vuMeter>
 
     <div role="status" v-bind:class="state" v-html="statusMessages[state]" />
 
@@ -352,6 +366,24 @@
 
       &.pause {
         @include button-inverse(white, #d95354);
+      }
+
+      .audio-recorder-wordlist {
+        border-top: 1px solid lightgrey;
+    }
+      .audio-recorder-wordlist .word{
+        display:flex;
+        border-bottom: 1px solid lightgrey;
+      }
+      .audio-recorder-wordlist .word > div{
+        display:flex;
+        justify-content: center;
+        padding: 4px;
+        align-items: center;
+        width:50%;
+      }
+      .audio-recorder-wordlist .word .text{
+        font-weight:700;
       }
 
       @media (min-width: $screen-small) {

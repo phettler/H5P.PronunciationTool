@@ -57,14 +57,14 @@
 
 <style lang="scss" type="text/scss">
   .recording-indicator-wrapper {
-    height: 9.375em;
-    width: 9.375em;
+    height: 100px;
+    width: 100px;
     margin-left: auto;
     margin-right: auto;
     line-height: 9.375em;
     color: #8e8e8e;
     position: relative;
-    margin-bottom: 1em;
+    margin-bottom: 0.5em;
   }
 
   .h5p-audio-recorder-vu-meter {

@@ -2,8 +2,11 @@ import Vue from 'vue';
 import AudioRecorderView from './views/AudioRecorder.vue';
 import VUMeter from './views/VUMeter.vue';
 import Timer from './views/Timer.vue';
+import WordList from './views/WordList.vue';
 import Recorder from 'components/Recorder';
 import State from 'components/State';
+
+H5P = H5P || {};
 
 const AUDIO_SRC_NOT_SPECIFIED = '';
 
@@ -46,6 +49,7 @@ export default class {
 
     AudioRecorderView.data = () => ({
       title: params.title,
+      words: params.words,
       state: recorder.supported() ? State.READY : State.UNSUPPORTED,
       statusMessages,
       l10n: params.l10n,
@@ -59,7 +63,13 @@ export default class {
       ...AudioRecorderView,
       components: {
         timer: Timer,
-        vuMeter: VUMeter
+        vuMeter: VUMeter,
+        wordList: WordList
+      },
+      methods:{
+        getFilePath: function(path){
+          return H5P.getPath(path, contentId);
+        }
       }
     });
 

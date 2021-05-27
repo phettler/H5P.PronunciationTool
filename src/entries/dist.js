@@ -1,3 +1,3 @@
 // Load library
 H5P = H5P || {};
-H5P.AudioRecorder = require('../app').default;
+H5P.PronunciationTool = require('../app').default;

@@ -1,12 +1,49 @@
 [
   {
-    "label": "Task Description",
+    "label": "Task Title",
     "importance": "high",
     "name": "title",
     "type": "text",
-    "widget": "textarea",
     "description": "Optional text to display above the audio recorder",
     "optional": true
+  },
+  {
+    "name": "words",
+    "label": "words",
+    "importance": "high",
+    "type": "list",
+    "widgets": [
+      {
+        "name": "VerticalTabs",
+        "label": "Default"
+      }
+    ],
+    "min": 1,
+    "entity": "Word",
+    "field": {
+      "name": "word",
+      "type": "group",
+      "label": "Word",
+      "fields": [
+        {
+          "name": "answer",
+          "type": "text",
+          "label": "Word or Phrase",
+          "description": "The word or phrase to practice.",
+          "importance": "medium"
+        },
+        {
+          "name": "audio",
+          "type": "library",
+          "label": "Pronunciation",
+          "optional": false,
+          "description": "Upload or paste the audio recording link below",
+          "options": [
+            "H5P.Audio 1.4"
+          ]
+        }
+      ]
+    }
   },
   {
     "label": "Localization",
