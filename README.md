@@ -14,7 +14,12 @@ Build project for production:
 
 ```bash
 npm run build
+cd ..
+h5p increase-patch-version H5P.PronunciationTool 
+h5p pack H5P.PronunciationTool h5p-pronunciation-tool.h5p
 ```
+
+Then upload `h5p-pronunciation-tool.h5p` to library.
 
 Run tests:
 
