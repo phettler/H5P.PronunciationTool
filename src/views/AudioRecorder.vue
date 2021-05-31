@@ -6,8 +6,9 @@
     <div v-for="word in words" class="word">
       <div class="text">{{ word.answer }}</div>
       <div class="audio">
-      <audio v-bind:controls="word.audio.params.controls" v-bind:autoplay="word.audio.params.autoplay" v-for="file in word.audio.params.files">
-        <source v-bind:path="file.path" v-bind:src="getFilePath(file.path)" v-bind:type="file.mime" />
+      <audio preload="auto" v-bind:controls="word.audio.params.controls" v-bind:autoplay="word.audio.params.autoplay" v-for="file in word.audio.params.files">
+        Audio tag is not supported in this browser.
+        <source v-bind:src="getFilePath(file.path)" v-bind:type="getFileType(file.mime)" />
       </audio>
       </div>
       <!--div class="path" v-for="file in word.audio.params.files">
@@ -21,17 +22,13 @@
     <div role="status" v-bind:class="state" v-html="statusMessages[state]" />
 
     <div class="h5p-audio-recorder-player" v-if="state === 'done' && audioSrc !== ''">
-      <audio controls="controls">
+      <audio controls="controls" autoplay>
         Your browser does not support the <code>audio</code> element.
         <source v-bind:src="audioSrc">
       </audio>
     </div>
 
     <timer ref="timer" v-bind:stopped="state !== 'recording'" v-if="state !== 'unsupported' && state !== 'done' && state !== 'insecure-not-allowed'"></timer>
-
-    <div v-if="state !== 'blocked' && state !== 'unsupported' && state === 'done'" class="h5p-audio-recorder-download">
-      {{ l10n.downloadRecording }}
-    </div>
 
     <div class="button-row">
       <div class="button-row-double">
@@ -42,6 +39,26 @@
           <span class="fa-circle"></span>
           {{ l10n.recordAnswer }}
         </button>
+        <button class="button record small"
+                ref="button-continue"
+                v-if="state === 'paused'"
+                v-on:click="record">
+          <span class="fa-circle"></span>
+          <span class="small-screen-hidden">{{ l10n.continue }}</span>
+        </button>
+        <button class="button pause small"
+                ref="button-pause"
+                v-if="state === 'recording'"
+                v-on:click="pause">
+          <span class="fa-pause"></span>
+          <span class="small-screen-hidden">{{ l10n.pause }}</span>
+        </button>
+        <button class="button done"
+                v-if="state === 'recording' || state === 'paused'"
+                v-on:click="done">
+          <span class="fa-play-circle"></span>
+          <span class="small-screen-hidden">{{ l10n.done }}</span>
+        </button>
 
         <button class="button retry small"
                 v-if="state === 'recording' || state === 'paused'"
@@ -49,47 +66,30 @@
           <span class="fa-undo"></span>
           <span class="small-screen-hidden">{{ l10n.retry }}</span>
         </button>
-        <button class="button pause"
-                ref="button-pause"
-                v-if="state === 'recording'"
-                v-on:click="pause">
-          <span class="fa-pause"></span>
-          <span class="small-screen-hidden">{{ l10n.pause }}</span>
-        </button>
-        <button class="button record"
-                ref="button-continue"
-                v-if="state === 'paused'"
-                v-on:click="record">
-          <span class="fa-circle"></span>
-          <span class="small-screen-hidden">{{ l10n.continue }}</span>
-        </button>
-        <button class="button done small"
-                v-if="state === 'recording' || state === 'paused'"
-                v-on:click="done">
-          <span class="fa-play-circle"></span>
-          <span class="small-screen-hidden">{{ l10n.done }}</span>
-        </button>
       </div>
 
       <span class="button-row-left">
-        <a class="button download"
-           ref="button-download"
-           v-if="state === 'done'"
-           v-bind:href="audioSrc"
-           v-bind:download="audioFilename">
-          <span class="icon-download"></span>
-          {{ l10n.download }}
-        </a>
+      <button class="button retry"
+              v-if="state === 'done' || state === 'cant-create-audio-file'"
+              v-on:click="retry">
+        <span class="fa-undo"></span>
+        <span class="small-screen-hidden">{{ l10n.retry }}</span>
+      </button>
       </span>
 
       <span class="button-row-right">
-        <button class="button retry"
-                v-if="state === 'done' || state === 'cant-create-audio-file'"
-                v-on:click="retry">
-          <span class="fa-undo"></span>
-          <span class="small-screen-hidden">{{ l10n.retry }}</span>
-        </button>
+      <a class="button download"
+         ref="button-download"
+         v-if="state === 'done'"
+         v-bind:href="audioSrc"
+         v-bind:download="audioFilename">
+        <span class="icon-download"></span>
+        {{ l10n.download }}
+      </a>
       </span>
+      <div v-bind:class="state" v-if="state !== 'blocked' && state !== 'unsupported' && state === 'done'" class="h5p-audio-recorder-download">
+        {{ l10n.downloadRecording }}
+      </div>
     </div>
   </div>
 </template>
@@ -120,8 +120,19 @@
         this.$emit(State.DONE);
       },
 
+      getFilePath: function(path){
+        return H5P.getPath(path, this.contentId);
+      },
+
+      getFileType: function(mime){
+        if(mime == 'audio/m4a'){
+          return 'audio/mp4';
+        }
+        return mime;
+      },
+
       retry: function() {
-        const dialog = new H5P.ConfirmationDialog(
+        /*const dialog = new H5P.ConfirmationDialog(
           {
             headerText: this.l10n.retryDialogHeaderText,
             dialogText: this.l10n.retryDialogBodyText,
@@ -138,6 +149,13 @@
           }
           this.$emit('retry');
         });
+        */
+        if(this.$refs.timer) {
+          this.$refs.timer.reset();
+        }
+        this.state = State.READY;
+        this.$emit('retry');
+        this.$emit(State.RECORDING);
       }
     },
 
@@ -207,6 +225,26 @@
       font-size: 1.250em;
       margin-bottom: 1em;
       line-height: 1.5em;
+    }
+
+    .audio-recorder-wordlist {
+      border-top: 1px solid lightgrey;
+
+      .word{
+        display:flex;
+        border-bottom: 1px solid lightgrey;
+
+        > div{
+          display:flex;
+          justify-content: center;
+          padding: 4px;
+          align-items: center;
+          width:50%;
+        }
+        .text{
+          font-size:1.4em;
+        }
+      }
     }
 
     .icon-download {
@@ -366,24 +404,6 @@
 
       &.pause {
         @include button-inverse(white, #d95354);
-      }
-
-      .audio-recorder-wordlist {
-        border-top: 1px solid lightgrey;
-    }
-      .audio-recorder-wordlist .word{
-        display:flex;
-        border-bottom: 1px solid lightgrey;
-      }
-      .audio-recorder-wordlist .word > div{
-        display:flex;
-        justify-content: center;
-        padding: 4px;
-        align-items: center;
-        width:50%;
-      }
-      .audio-recorder-wordlist .word .text{
-        font-weight:700;
       }
 
       @media (min-width: $screen-small) {

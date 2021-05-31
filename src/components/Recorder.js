@@ -194,6 +194,7 @@ export default class Recorder extends H5P.EventDispatcher {
         });
       }).catch(e => {
         let reason = 'blocked';
+        console.log(e);
         if (e.name && ['NotSupportedError', 'NotSupportedError', 'NotAllowedError'].indexOf(e.name) !== -1) {
           reason = 'insecure-not-allowed';
         }
