@@ -12,6 +12,7 @@ cd H5P.PronunciationTool
 npm install
 ```
 
+## Developing
 Build project for production:
 
 ```bash
