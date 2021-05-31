@@ -7,6 +7,8 @@ A fork of H5P Audio Recorder for the purpose of creating a vocabulary list to pr
 Grab all the modules:
 
 ```bash
+git clone https://github.com/phettler/H5P.PronunciationTool.git
+cd H5P.PronunciationTool
 npm install
 ```
 
